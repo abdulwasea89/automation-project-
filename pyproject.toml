@@ -1,0 +1,31 @@
+[project]
+name = "src"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "abdulwasea89", email = "abdulwasea853@gmail.com" }
+]
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi>=0.115.13",
+    "google-cloud-firestore>=2.21.0",
+    "google-cloud-storage>=3.1.1",
+    "httpx>=0.28.1",
+    "langdetect>=1.0.9",
+    "openai>=1.90.0",
+    "openai-agents>=0.0.19",
+    "pytest>=8.4.1",
+    "python-dotenv>=1.1.0",
+    "requests>=2.32.4",
+    "shopifyapi>=12.7.0",
+    "tenacity>=9.1.2",
+    "uvicorn[standard]>=0.34.3",
+]
+
+[project.scripts]
+automation = "automation.main:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

@@ -1,0 +1,13 @@
+fastapi
+uvicorn[standard]
+python-dotenv
+google-cloud-firestore
+google-cloud-storage
+openai
+openai-agents
+tenacity
+ShopifyAPI
+requests
+langdetect
+pytest
+httpx
