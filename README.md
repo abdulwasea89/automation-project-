@@ -620,14 +620,14 @@ docker logs -f ai-middleware
 gcloud logging read "resource.type=cloud_run_revision"
 ```
 
-### Step 8: Advanced Features
+### Step 8: Advanced Features 
 
 #### 8.1 Rich Media Messages
 ```bash
 # Send images, documents, videos
 # Update zoko_client.py to support:
 - send_image()
-- send_document()
+- send_document()  
 - send_video()
 - send_audio()
 ```
