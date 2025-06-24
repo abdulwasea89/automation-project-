@@ -27,7 +27,7 @@ logger = get_logger("main")
 
 app = FastAPI(title="ZOKO-Shopify AI Middleware")
 
-API_KEY = os.getenv("API_KEY", "changeme")
+API_KEY = os.getenv("API_KEY")
 RATE_LIMIT = 30  # requests
 RATE_PERIOD = 60  # seconds
 rate_limit_store = defaultdict(list)
@@ -56,7 +56,6 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             return JSONResponse(status_code=429, content={"detail": "Rate limit exceeded"})
         return await call_next(request)
 
-app.add_middleware(ApiKeyMiddleware)
 app.add_middleware(RateLimitMiddleware)
 app.add_middleware(
     CORSMiddleware,

@@ -5,7 +5,7 @@ from src.logger import get_logger
 
 logger = get_logger("broadcast")
 
-with open("templates.json") as f:
+with open("./templates.json") as f:
     TEMPLATES = json.load(f)
 
 def get_all_users() -> list[dict]:

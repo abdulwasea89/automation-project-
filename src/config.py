@@ -8,7 +8,7 @@ class Settings:
     PROJECT_ID: str = os.getenv("PROJECT_ID")
     # OpenAI
     OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY")
-    # Shopify
+    # Shopify     
     SHOPIFY_API_KEY: str = os.getenv("SHOPIFY_API_KEY")
     SHOPIFY_API_PASSWORD: str = os.getenv("SHOPIFY_API_PASSWORD")
     SHOPIFY_STORE_NAME: str = os.getenv("SHOPIFY_STORE_NAME")
