@@ -1,0 +1,36 @@
+steps:
+  # 1. Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/ai-middleware', '.']
+
+  # 2. Push Docker image to Google Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/ai-middleware']
+
+  # 3. Deploy to Google Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'ai-middleware'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/ai-middleware'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--memory'
+      - '1Gi'
+      - '--cpu'
+      - '1'
+      - '--max-instances'
+      - '10'
+      - '--set-env-vars'
+      - 'ENV=production,PROJECT_ID=$PROJECT_ID'
+      - '--set-secrets'
+      - 'OPENAI_API_KEY=openai-api-key:latest,SHOPIFY_API_KEY=shopify-api-key:latest,SHOPIFY_API_PASSWORD=shopify-password:latest,SHOPIFY_STORE_NAME=shopify-store:latest,ZOKO_API_KEY=zoko-api-key:latest,API_KEY=api-key:latest'
+
+images:
+  - 'gcr.io/$PROJECT_ID/ai-middleware' 

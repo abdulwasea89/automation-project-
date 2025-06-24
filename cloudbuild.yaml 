@@ -1,0 +1,34 @@
+steps:
+  # 1. (Optional but recommended) Run tests before building
+  - name: 'python:3.11-slim'
+    entrypoint: bash
+    args: ['-c', 'pip install -r requirements.txt && pytest || exit 1']
+
+  # 2. Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/ai-middleware', '.']
+
+  # 3. Push Docker image to Google Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/ai-middleware']
+
+  # 4. Deploy to Google Cloud Run
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - 'run'
+      - 'deploy'
+      - 'ai-middleware'
+      - '--image'
+      - 'gcr.io/$PROJECT_ID/ai-middleware'
+      - '--region'
+      - 'us-central1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--set-env-vars'
+      # Add all your required environment variables here, comma-separated:
+      - 'ENV=production,API_KEY=your-key,PROJECT_ID=your-gcp-id,OPENAI_API_KEY=sk-...,SHOPIFY_API_KEY=...,SHOPIFY_API_PASSWORD=...,SHOPIFY_STORE_NAME=...,ZOKO_API_KEY=...'
+
+images:
+  - 'gcr.io/$PROJECT_ID/ai-middleware'
