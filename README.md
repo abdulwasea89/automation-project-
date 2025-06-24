@@ -443,6 +443,289 @@ Access the interactive API documentation:
 - **Swagger UI:** `https://your-app-url.a.run.app/docs`
 - **ReDoc:** `https://your-app-url.a.run.app/redoc`
 
+## 📱 ZOKO-WhatsApp Integration
+
+### Prerequisites
+- Active ZOKO account (https://zoko.io/)
+- WhatsApp Business API approval
+- Verified business phone number
+- Production webhook URL (HTTPS required)
+
+### Step 1: ZOKO Account Setup
+
+#### 1.1 Create ZOKO Account
+1. **Visit:** https://zoko.io/
+2. **Sign up** for a ZOKO account
+3. **Verify** your email and phone number
+4. **Complete** business verification
+
+#### 1.2 WhatsApp Business API Setup
+```bash
+# In ZOKO Dashboard:
+1. Go to "WhatsApp" → "Get Started"
+2. Select your business type
+3. Provide business details:
+   - Business name
+   - Business address
+   - Business description
+   - Website URL
+4. Upload required documents
+5. Wait for approval (24-48 hours)
+```
+
+### Step 2: Get ZOKO API Credentials
+
+#### 2.1 API Key Generation
+```bash
+# In ZOKO Dashboard:
+1. Go to "Settings" → "API Keys"
+2. Click "Generate New API Key"
+3. Copy the API key (starts with 'zoko_')
+4. Add to your .env file:
+   ZOKO_API_KEY=zoko_your_api_key_here
+```
+
+#### 2.2 Webhook URL Setup
+```bash
+# Your webhook URL will be:
+# Local: http://localhost:8080/webhook/zoko
+# Production: https://your-app-url.a.run.app/webhook/zoko
+```
+
+### Step 3: Configure Webhook in ZOKO
+
+#### 3.1 Set Webhook URL
+```bash
+# In ZOKO Dashboard:
+1. Go to "Settings" → "Webhooks"
+2. Add webhook URL: https://your-app-url.a.run.app/webhook/zoko
+3. Select events:
+   ✅ message_received
+   ✅ message_delivered
+   ✅ message_read
+4. Set HTTP method: POST
+5. Add headers:
+   x-api-key: your-secret-api-key
+6. Save webhook configuration
+```
+
+#### 3.2 Test Webhook
+```bash
+# Test webhook connectivity
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H "x-api-key: your-secret-api-key" \
+  -d '{
+    "messages": [{
+      "from": "1234567890",
+      "text": {
+        "body": "Hello, test message"
+      }
+    }]
+  }' \
+  https://your-app-url.a.run.app/webhook/zoko
+```
+
+### Step 4: WhatsApp Business Setup
+
+#### 4.1 Phone Number Configuration
+```bash
+# In ZOKO Dashboard:
+1. Go to "WhatsApp" → "Phone Numbers"
+2. Add your business phone number
+3. Verify the number via SMS/call
+4. Set display name and business info
+5. Configure business hours and away message
+```
+
+#### 4.2 Message Templates (Optional)
+```bash
+# Create message templates for:
+1. Welcome messages
+2. Product catalogs
+3. Order confirmations
+4. Customer support
+
+# Template example:
+"Hi {{1}}, welcome to {{2}}! 🎉 
+How can we help you today?"
+```
+
+### Step 5: Integration Testing
+
+#### 5.1 Test Message Flow
+```bash
+# 1. Send test message from WhatsApp
+# 2. Check webhook receives it:
+docker logs ai-middleware | grep "webhook"
+
+# 3. Verify AI response:
+docker logs ai-middleware | grep "OpenAI"
+
+# 4. Check ZOKO sends response:
+docker logs ai-middleware | grep "Sent text"
+```
+
+#### 5.2 Test Different Scenarios
+```bash
+# Test product recommendation
+"recommend shoes for running"
+
+# Test general chat
+"Hello, how are you?"
+
+# Test different languages
+"Hola, necesito ayuda" (Spanish)
+"Bonjour, je voudrais des informations" (French)
+```
+
+### Step 6: Production Deployment
+
+#### 6.1 Update Environment Variables
+```bash
+# In your .env file:
+ZOKO_API_KEY=zoko_your_production_api_key
+API_KEY=your_production_api_key
+
+# In Google Cloud Run:
+gcloud run services update ai-middleware \
+  --set-env-vars "ZOKO_API_KEY=zoko_your_key,API_KEY=your_key"
+```
+
+#### 6.2 SSL Certificate (Required for Production)
+```bash
+# Google Cloud Run provides HTTPS automatically
+# Your webhook URL will be:
+https://ai-middleware-xxxxx-uc.a.run.app/webhook/zoko
+```
+
+### Step 7: Monitoring and Analytics
+
+#### 7.1 ZOKO Dashboard Analytics
+```bash
+# Monitor in ZOKO Dashboard:
+1. Message delivery rates
+2. Response times
+3. Customer engagement
+4. Template performance
+5. Error rates
+```
+
+#### 7.2 Application Logs
+```bash
+# Monitor your application:
+docker logs -f ai-middleware
+
+# Or in Google Cloud:
+gcloud logging read "resource.type=cloud_run_revision"
+```
+
+### Step 8: Advanced Features 
+
+#### 8.1 Rich Media Messages
+```bash
+# Send images, documents, videos
+# Update zoko_client.py to support:
+- send_image()
+- send_document()  
+- send_video()
+- send_audio()
+```
+
+#### 8.2 Interactive Messages
+```bash
+# Send buttons, quick replies
+# Example carousel for products:
+{
+  "type": "interactive",
+  "interactive": {
+    "type": "product_list",
+    "body": "Here are our products:",
+    "action": {
+      "button": "View Products",
+      "sections": [...]
+    }
+  }
+}
+```
+
+#### 8.3 Broadcast Messages
+```bash
+# Send promotional messages to all users
+curl -X POST \
+  -H "x-api-key: your-api-key" \
+  https://your-app-url.a.run.app/broadcast/promo
+```
+
+### Step 9: Troubleshooting
+
+#### 9.1 Common Issues
+```bash
+# Webhook not receiving messages:
+1. Check webhook URL is correct
+2. Verify API key in headers
+3. Check SSL certificate (production)
+4. Test webhook connectivity
+
+# Messages not sending:
+1. Verify ZOKO API key
+2. Check message format
+3. Ensure phone number is verified
+4. Check rate limits
+
+# AI responses not working:
+1. Verify OpenAI API key
+2. Check internet connectivity
+3. Monitor OpenAI rate limits
+4. Check application logs
+```
+
+#### 9.2 Debug Commands
+```bash
+# Test ZOKO API directly:
+curl -H "Authorization: Bearer zoko_your_key" \
+  https://api.zoko.io/v1/messages
+
+# Check webhook logs:
+docker logs ai-middleware | grep "zoko"
+
+# Test OpenAI integration:
+curl -H "x-api-key: your-key" \
+  https://your-app-url.a.run.app/test-gcp
+```
+
+### Step 10: Best Practices
+
+#### 10.1 Message Guidelines
+```bash
+# Follow WhatsApp Business Policy:
+1. No spam or unsolicited messages
+2. Respect business hours
+3. Provide opt-out options
+4. Use approved message templates
+5. Maintain professional tone
+```
+
+#### 10.2 Performance Optimization
+```bash
+# Optimize for scale:
+1. Implement message queuing
+2. Add retry mechanisms
+3. Cache frequent responses
+4. Monitor API rate limits
+5. Use async processing
+```
+
+### Quick Start Checklist
+- [ ] Create ZOKO account
+- [ ] Get WhatsApp Business approval
+- [ ] Generate API key
+- [ ] Configure webhook URL
+- [ ] Test message flow
+- [ ] Deploy to production
+- [ ] Monitor performance
+- [ ] Set up analytics
+
 ## 🔐 Security & Authentication
 
 ### API Key Authentication
